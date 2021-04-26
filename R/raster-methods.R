@@ -74,19 +74,29 @@ setMethod("initialize", "DeponsRaster",
 #' @title Summary
 #' @rdname summary
 #' @aliases summary,DeponsRaster-method
+#' @return list summarizing the DeponsRaster object
 #' @exportMethod summary
 setMethod("summary", "DeponsRaster",
           function(object) {
-            cat("class:\t", "DeponsRaster \n")
-            cat("type:\t", object@type, "\n")
+            cat("class: \t", "DeponsRaster \n")
+            cat("type:  \t", object@type, "\n")
             cat("landsc:\t", object@landscape, "\n")
-            cat("crs:\t", object@crs, "\n")
+            cat("crs:   \t", object@crs, "\n")
             cat("extent:\t ", object@ext$xleft, ", ", object@ext$ybottom, ", ",
                 object@ext$xright, ", ", object@ext$ytop,
                 " (xleft, ybottom, xright, ytop) \n", sep="")
-            cat("dim: \t", as.character(nrow(object@data), ""))
+            cat("dim:   \t", as.character(nrow(object@data), ""))
             cat(" x", as.character(ncol(object@data)))
             cat(" (nrow, ncol) \n")
+            dim <- data.frame("nrow"=nrow(object@data), "ncol"=ncol(object@data))
+            out <- list(
+              "type" <- object@type,
+              "landscape" <- object@landscape,
+              "crs" <- object@crs,
+              "extent" <- object@ext,
+              "dim" <- dim
+            )
+            return(invisible(out))
           }
 )
 
@@ -116,7 +126,7 @@ setMethod("summary", "DeponsRaster",
 #' @references Nabe-Nielsen, J., van Beest, F. M., Grimm, V., Sibly, R. M.,
 #' Teilmann, J., & Thompson, P. M. (2018). Predicting the impacts of
 #' anthropogenic disturbances on marine populations. Conservation Letters,
-#' 11(5), e12563. \url{https://doi.org/10.1111/conl.12563}
+#' 11(5), e12563. \doi{10.1111/conl.12563}
 #' @export read.DeponsRaster
 read.DeponsRaster <- function(fname, type="NA", landscape="NA",
                               crs="NA") {
@@ -164,58 +174,69 @@ setGeneric("plot")
 #' @param y A \code{DeponsTrack} object or missing
 #' @param trackToPlot Integer indicating which track to plot if the DeponsTrack
 #' object contains more than one track. Ignored if \code{y} is missing
-#' @param maxpixels integer > 0. Maximum number of cells to use for the plot.
-#' If maxpixels < ncell(x), sampleRegular is used before plotting.
 #' @param col A color palette, i.e. a vector of n contiguous colors. Reasonable
 #' defaults are provided.
-#' @param alpha Number between 0 and 1 to set transparency. 0 is entirely
-#' transparent, 1 is not transparent (NULL is equivalent to 1)
-#' @param colNA The color to use for the background (default is transparent)
-#' @param add Logical. Whether to add map to the current plot
-#' @param ext An extent object allowing to plot only part of the map
-#' @param useRaster If TRUE, the rasterImage function is used for plotting.
-#' Otherwise the image function is used
-#' @param interpolate Logical. Should the image be interpolated (smoothed)?
-#' Only used when useRaster = TRUE
-#' @param addfun Function to add additional items such as points or polygons
-#' to the plot
-#' @param nc Not used for plotting DeponsRaster objects
-#' @param nr Not used for plotting DeponsRaster objects
-#' @param maxnl Not used for plotting DeponsRaster objects
-#' @param main Character. Plot title
-#' @param npretty Integer. Number of decimals for pretty lables on the axes
-#' @param axes Whether to plot tick marks
-#' @param legend Whether to plot the colour legend
-#' @param ... Other optional plotting parameters
+#' @param ... Other optional plotting parameters, including 'axes', 'legend',
+#' and 'main'.
 #' @examples
 #' \donttest{
 #' data("bathymetry")
-#' plot(bathymetry)
-#' data("coastline")
-#' library(rgdal)
-#' # Change projection of coastline to match that of bathymetry data
+#' data(coastline)
+#' library(sp)
 #' coastline2 <- spTransform(coastline, crs(bathymetry))
-#' plot(coastline2, add=TRUE, col="lightyellow2")
-#' }
-#' text(512000, 6240000, 'Denmark')
-#' text(800000, 6300000, 'Sweden')
+#' bbox <- bbox(bathymetry)
+#' clip.poly <- make.clip.poly(bbox, crs(bathymetry))
+#' if(!identical(crs(bathymetry), crs(coastline2))) stop("Non-matching CRSs")
+#' new.coastline <- rgeos::gIntersection(coastline2, clip.poly, byid = TRUE, drop_lower_td = TRUE)
 #'
-#' plot(bathymetry, axes=FALSE, legend=FALSE, main="Simulated porpoise track")
-#' data("porpoisetrack")
-#' plot(porpoisetrack, add=TRUE)
-#' @seealso See method for \code{\link[raster]{plot}} in the
-#' \code{raster} package for details.
+#' plot(new.coastline, lwd=0.001)
+#' plot(bathymetry, add=TRUE)
+#' plot(new.coastline, add=TRUE, col="lightyellow2")
+#' plot(clip.poly, add=TRUE)
+#' }
+#' @seealso See method for \code{\link[raster]{plot}} in the \code{raster}
+#' package for plotting parameters and \code{\link{plot.DeponsTrack}} for
+#' plotting of DeponsRasters cropped to the extent of tracks.
+#' @import rgdal
+#' @return No return value, called for side effects
 #' @exportMethod plot
 setMethod("plot", signature("DeponsRaster", "ANY"),
-          function(x, y, maxpixels=500000, col, alpha=NULL, colNA=NA, add=FALSE,
-                   ext=NULL, useRaster=TRUE, interpolate=FALSE, addfun=NULL,
-                   nc, nr, maxnl=16, main, npretty=0, axes=TRUE,
-                   legend=TRUE, trackToPlot=1, ...)  {
+          function(x, y, col, trackToPlot=1, ...)  {
+            # Define plotting parameters
             oldpar <- graphics::par(no.readonly = TRUE)
             on.exit(graphics::par(oldpar))
-            if (missing(main)) {
-              main <- paste(x@landscape, x@type, sep=" - ")
-            }
+            dots <- list(...)
+            maxpixels <- 500000
+            if("maxpixels" %in% names(dots)) maxpixels <- dots$maxpixels
+            alpha <- NULL
+            if("alpha" %in% names(dots)) alpha <- dots$alpha
+            colNA <- NA
+            if("colNA" %in% names(dots)) colNA <- dots$colNA
+            add <- FALSE
+            if("add" %in% names(dots)) add <- dots$add
+            useRaster <- TRUE
+            if("useRaster" %in% names(dots)) useRaster <- dots$useRaster
+            ext <- NULL
+            if("ext" %in% names(dots)) ext <- dots$ext
+            interpolate <- FALSE
+            if("interpolate" %in% names(dots)) interpolate <- dots$interpolate
+            nr <- NA
+            nc <- NA
+            interpolate <- FALSE
+            if("interpolate" %in% names(dots)) interpolate <- dots$interpolate
+            addfun <- NULL
+            if("addfun" %in% names(dots)) addfun <- dots$addfun
+            maxnl <- 16
+            if("maxnl" %in% names(dots)) maxnl <- dots$maxnl
+            npretty <- 0
+            if("npretty" %in% names(dots)) npretty <- dots$npretty
+            axes <- TRUE
+            if("axes" %in% names(dots)) axes <- dots$axes
+            legend <- TRUE
+            if("legend" %in% names(dots)) legend <- dots$legend
+            # Define colours specific or 'type'
+            main <- paste(x@landscape, x@type, sep=" - ")
+            if("main" %in% names(dots)) main <- dots$main
             # Define colours specific or 'type'
             if(missing(col) && x@type=="bathymetry") {
               tmp.col <- grDevices::rainbow(1000)[501:800]
@@ -223,33 +244,16 @@ setMethod("plot", signature("DeponsRaster", "ANY"),
             }
             # Use {raster}-package for plotting
             if(x@crs=="NA") {
-              crs2 <- sp::CRS(as.character(NA))
+              crs2 <- raster::crs(as.character(NA))
             } else {
-              crs2 <- sp::CRS(x@crs)
+              crs2 <- raster::crs(x@crs)
             }
             rdata <- raster::raster(x=x@data, xmn=x@ext$xleft, xmx=x@ext$xright,
                                     ymn=x@ext$ybottom, ymx=x@ext$ytop,
                                     crs=crs2)
             raster::plot(rdata, col=col, main=main,
                          alpha=alpha, add=add, ext=ext, axes=axes, legend=legend)
-          }
-)
-
-
-setGeneric("crs")
-
-#' Get or set map projection
-#' @name crs
-#' @description Get or set the map projection (also known as coordinate reference
-#' system, crs) of DeponsRaster and DeponsTrack objects. For {sp} objects the
-#' text string defining the crs is called the \code{\link[sp]{proj4string}}.
-#' @aliases crs,DeponsRaster-method
-#' @aliases crs,DeponsTrack-method
-#' @param x Object of class {code{DeponsRaster}}.
-#' @exportMethod crs
-setMethod("crs", signature("DeponsRaster"),
-          function(x) {
-            return(sp::CRS(x@crs))
+            return(invisible(NULL))
           }
 )
 
@@ -341,6 +345,8 @@ setGeneric("make.blocksraster", make.br)
 #' @param fname Name of the output raster file (character string ending with
 #' '.asc'). No file is written to disk if fname is not provided.
 #' @param overwrite Whether to replace existing file.
+#' @return \code{RasterLayer} object defining different subregions of the
+#' landscape where animals should be counted.
 #' @note The blocks file should not be modified when running DEPONS
 #' simulations using the 'Kattegat' landscape. In this landscape the simulated
 #' animals use the blocks file for navigation. Also note that blocks are added
@@ -374,5 +380,19 @@ setGeneric("make.blocksraster", make.br)
 setMethod("make.blocksraster", signature("DeponsRaster"), make.br)
 
 
+setGeneric("bbox", function(obj){})
+
+#' @name bbox
+#' @rdname bbox
+#' @aliases bbox,DeponsRaster-method
+#' @exportMethod bbox
+setMethod("bbox", signature("DeponsRaster"),
+          function(obj) {
+            x <- c(obj@ext$xleft, obj@ext$xright)
+            y <- c(obj@ext$ybottom, obj@ext$ytop)
+            extremes <- sp::SpatialPoints(cbind(x, y), proj4string=sp::CRS(obj@crs))
+            return(sp::bbox(extremes))
+          }
+)
 
 

@@ -9,7 +9,7 @@ read.DeponsTrack(
   title = "NA",
   landscape = "NA",
   simtime = "NA",
-  crs = CRS(as.character(NA)),
+  crs = as.character(NA),
   tz = "UTC"
 )
 }
@@ -23,8 +23,8 @@ not the current working directory.}
 \item{landscape}{Optional character string with the landscape used in the
 simulation}
 
-\item{simtime}{Optional POSIXlt object with date of simulation. If
-not provided this is obtained from name of input file}
+\item{simtime}{Character sting with date of simulation (format yyyy-mm-dd).
+If not provided this is obtained from name of input file}
 
 \item{crs}{Character, coordinate reference system (map projection)}
 
@@ -32,11 +32,11 @@ not provided this is obtained from name of input file}
 #'}
 }
 \value{
-Returns an object with the elements \code{title}, \code{simtime},
-\code{crs}, and \code{tracks}. The \code{date} is extracted from input data
-if not provided explicitly and stored as a  \code{\link{POSIXlt}} object. The
-element \code{tracks} is a list of objects of class
-\link[sp]{SpatialPointsDataFrame}, each of which corresponds to one
+Returns a \code{DeponsTrack} object with the elements \code{title},
+\code{simtime}, \code{crs}, and \code{tracks}. The \code{date} is extracted
+from input data if not provided explicitly and stored as a
+\code{\link{POSIXlt}} object. The element \code{tracks} is a list of objects
+of class \link[sp]{SpatialPointsDataFrame}, each of which corresponds to one
 simulated animal (several animals can be tracked in one simulation).
 }
 \description{

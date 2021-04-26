@@ -21,11 +21,14 @@ not the current working directory.}
 
 \item{landscape}{The landscape used in the simulation}
 
-\item{simtime}{Optional POSIXlt object with date of simulation. If
-not provided this is obtained from name of input file}
+\item{simtime}{Optional text string with date of simulation (format:
+yyyy-mm-dd). If not provided this is obtained from name of input file}
 
 \item{startday}{The start of the period that the  simulation represents, i.e.
 the real-world equivalent of 'tick 1' (POSIXlt)}
+}
+\value{
+\code{DeponsBlockdyn} object
 }
 \description{
 Function for reading DEPONS simulation output with number of
@@ -42,7 +45,10 @@ porpoise.blockdyn
 
 # Get the latest simulation
 the.file <- get.latest.sim(type="blockdyn", dir="/Applications/DEPONS 2.1/DEPONS")
+owd <- getwd()
+setwd("/Applications/DEPONS 2.1/DEPONS")
 porpoise.blockdyn <- read.DeponsBlockdyn(fname=the.file)
+setwd(owd)
 }
 }
 \seealso{

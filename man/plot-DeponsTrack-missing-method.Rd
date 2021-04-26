@@ -20,6 +20,9 @@ one animal was tracked during the simulation.}
 
 \item{...}{Optional plotting parameters}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Plot the coordinates in a movement track simulated with DEPONS.
 }
@@ -29,13 +32,27 @@ data("porpoisetrack")
 plot(porpoisetrack)
 
 \donttest{
-# Optional: Transform and plot coastline if rgdal is installed
-data("coastline")
-library(rgdal)
-coast2 <- sp::spTransform(coastline, CRS("+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs"))
-# Check that the coastline-map is projected the same way as the track before
-# plotting:
-as.character(crs(porpoisetrack)) == as.character(crs(coast2))
-plot(coast2, col="lightyellow2", add=TRUE)
+data(coastline)
+data(bathymetry)
+coastline2 <- sp::spTransform(coastline, crs(bathymetry))
+
+data(porpoisetrack)
+bbox <- bbox(porpoisetrack)
+clip.poly <- make.clip.poly(bbox, crs(bathymetry))
+if(!identical(crs(bathymetry), crs(coastline2))) stop("Non-matching CRSs")
+new.coastline <- rgeos::gIntersection(coastline2, clip.poly, byid = TRUE,
+    drop_lower_td = TRUE)
+
+plot(new.coastline, col="lightyellow2")
+plot(porpoisetrack, col="blue", add=TRUE)
+plot(clip.poly, add=TRUE)
+# Clip to zoom in on smaller region
+bbox <- cbind("min"=c(549517, 6155000), "max"=c(636000, 6210000))
+rownames(bbox) <- c("x", "y")
+clip.poly <- make.clip.poly(bbox, crs(bathymetry))
+new.coastline <- rgeos::gIntersection(coastline2, clip.poly, byid = TRUE,
+                                      drop_lower_td = TRUE)
+plot(new.coastline, col="lightyellow2")
+plot(porpoisetrack, col="blue", add=TRUE)
 }
 }

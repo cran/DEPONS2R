@@ -61,6 +61,7 @@ setMethod("initialize", "DeponsBlockdyn",
 #' @details The summary method is available for \code{\link{DeponsTrack-class}},
 #' \code{\link{DeponsDyn-class}}, \code{\link{DeponsRaster-class}},
 #' and \code{\link{DeponsBlockdyn-class}}-objects.
+#' @return list summarizing the DeponsBlockdyn object
 #' @exportMethod summary
 setMethod("summary", "DeponsBlockdyn",
           function(object) {
@@ -80,6 +81,17 @@ setMethod("summary", "DeponsBlockdyn",
               if(max(cnt)<1000) cat("   \t", b, "\t", min(cnt), "   \t", rnd(mean(cnt)), "   \t", max(cnt), "\n")
               else cat("  \t", b, "\t", min(cnt), "\t", rnd(mean(cnt)), "\t", max(cnt), "\n")
             }
+            nticks <- max(object@dyn$tick)
+            ndays <- max(object@dyn$tick)/48
+            out <- list(
+              "title" <- object@title,
+              "landscape" <- object@landscape,
+              "simtime" <- object@simtime,
+              "startday" <- object@startday,
+              "nticks" <- nticks,
+              "ndays" <- object@ext
+            )
+            return(invisible(out))
           }
 )
 
@@ -94,15 +106,17 @@ setMethod("summary", "DeponsBlockdyn",
 #' not the current working directory.
 #' @param title Optional character string giving name of simulation
 #' @param landscape The landscape used in the simulation
-#' @param simtime Optional POSIXlt object with date of simulation. If
-#' not provided this is obtained from name of input file
+#' @param simtime Optional text string with date of simulation (format:
+#' yyyy-mm-dd). If not provided this is obtained from name of input file
 #' @param startday The start of the period that the  simulation represents, i.e.
 #' the real-world equivalent of 'tick 1' (POSIXlt)
 #' @seealso See \code{\link{DeponsBlockdyn-class}} for details on what is stored in
 #' the output object and \code{\link{read.DeponsParam}} for reading the parameters
 #' used in the simulation.
 #' @export read.DeponsBlockdyn
-#' @examples \dontrun{
+#' @return \code{DeponsBlockdyn} object
+#' @examples
+#' \dontrun{
 #' # File loaded from default location
 #' the.file <- "/Applications/DEPONS 2.1/DEPONS/PorpoisePerBlock.2020.Sep.02.20_24_17.csv"
 #' file.exists(the.file)
@@ -112,7 +126,10 @@ setMethod("summary", "DeponsBlockdyn",
 #'
 #' # Get the latest simulation
 #' the.file <- get.latest.sim(type="blockdyn", dir="/Applications/DEPONS 2.1/DEPONS")
+#' owd <- getwd()
+#' setwd("/Applications/DEPONS 2.1/DEPONS")
 #' porpoise.blockdyn <- read.DeponsBlockdyn(fname=the.file)
+#' setwd(owd)
 #' }
 read.DeponsBlockdyn <- function(fname, title="NA", landscape="NA", simtime="NA",
                            startday="NA") {
@@ -154,6 +171,8 @@ read.DeponsBlockdyn <- function(fname, title="NA", landscape="NA", simtime="NA",
 #' # Show all data points for small range of x-values
 #' plot(porpoisebdyn, xlim=c(1950, 2050), ylim=c(4850, 5050), type="p", dilute=1, col=my.col)
 #' @importFrom graphics points
+#' @return \code{data.frame} listing blocks where no animals were counted
+#' (returned invisibly)
 #' @note The function returns a data frame with numbers of blocks with no agents.
 setMethod("plot", signature("DeponsBlockdyn", "missing"),
           function(x, y, dilute=5, ...)  {

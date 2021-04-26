@@ -5,13 +5,15 @@
 \title{Package for analyzing DEPONS simulation output}
 \description{
 Classes and methods for analyzing and plotting movement tracks
-and population dynamics simulated using the DEPONS model (\url{http://www.depons.eu}).
+and population dynamics simulated using the DEPONS model
+(\url{http://www.depons.eu}), and for handling shipping routes used in the model.
 
-The types of simulated data include:
+The classes used in DEPONS2R include:
 \itemize{
 \item \code{\linkS4class{DeponsTrack}} movement tracks, read from "RandomPorpoise.XXX.csv" files
 \item \code{\linkS4class{DeponsDyn}} population dynamics data, from "Statistics.XXX.csv" files
 \item \code{\linkS4class{DeponsBlockdyn}} data from "PorpoisePerBlock.XXX.csv" files
+\item \code{\linkS4class{DeponsShips}} data from "ships.json" files
 }
 Here the \code{DeponsDyn} data include both changes in population size and energetics
 through time for the entire landscape, whereas \code{DeponsBlockdyn} data include

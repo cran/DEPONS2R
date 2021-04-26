@@ -47,6 +47,7 @@ setMethod("initialize", "DeponsTrack",
 #' @title Summary
 #' @rdname summary
 #' @aliases summary,DeponsTrack-method
+#' @return list summarizing the DeponsTrack object
 #' @exportMethod summary
 setMethod("summary", "DeponsTrack",
           function(object) {
@@ -56,6 +57,14 @@ setMethod("summary", "DeponsTrack",
             cat("simtime:  \t", as.character(object@simtime), "\n")
             cat("crs:      \t", object@crs, "\n")
             cat("N tracks: \t", length(object@tracks), "\n")
+            out <- list(
+              "title" <- object@title,
+              "landscape" <- object@landscape,
+              "simtime" <- object@simtime,
+              "crs" <- object@crs,
+              "tracks" <- object@tracks
+            )
+            return(invisible(out))
           }
 )
 
@@ -76,16 +85,16 @@ setMethod("summary", "DeponsTrack",
 #' @param title Optional character string giving name of simulation
 #' @param landscape Optional character string with the landscape used in the
 #' simulation
-#' @param simtime Optional POSIXlt object with date of simulation. If
-#' not provided this is obtained from name of input file
+#' @param simtime Character sting with date of simulation (format yyyy-mm-dd).
+#' If not provided this is obtained from name of input file
 #' @param crs Character, coordinate reference system (map projection)
 #' @param tz Time zone used in simulations. Defaults to UTC/GMT.
 #' #'
-#' @return Returns an object with the elements \code{title}, \code{simtime},
-#' \code{crs}, and \code{tracks}. The \code{date} is extracted from input data
-#' if not provided explicitly and stored as a  \code{\link{POSIXlt}} object. The
-#' element \code{tracks} is a list of objects of class
-#' \link[sp]{SpatialPointsDataFrame}, each of which corresponds to one
+#' @return Returns a \code{DeponsTrack} object with the elements \code{title},
+#' \code{simtime}, \code{crs}, and \code{tracks}. The \code{date} is extracted
+#' from input data if not provided explicitly and stored as a
+#' \code{\link{POSIXlt}} object. The element \code{tracks} is a list of objects
+#' of class \link[sp]{SpatialPointsDataFrame}, each of which corresponds to one
 #' simulated animal (several animals can be tracked in one simulation).
 #' @examples
 #' data(porpoisetrack) # Load data for use in example
@@ -107,7 +116,7 @@ setMethod("summary", "DeponsTrack",
 #' plot(porpoisetrack)
 #' @export read.DeponsTrack
 read.DeponsTrack <- function(fname, title="NA", landscape="NA", simtime="NA",
-                             crs=CRS(as.character(NA)), tz="UTC") {
+                             crs=as.character(NA), tz="UTC") {
   raw.data <- utils::read.csv(fname, sep=";")
   # Get sim date and time from file name
   if (simtime=="NA")  simtime <- get.simtime(fname)
@@ -129,7 +138,9 @@ read.DeponsTrack <- function(fname, title="NA", landscape="NA", simtime="NA",
   all.data <- new("DeponsTrack")
   all.data@title <- title
   all.data@landscape <- landscape
-  all.data@simtime <- as.POSIXlt(simtime, tz=tz)
+  if ("POSIXlt" %in% class(simtime)) all.data@simtime <- simtime
+  else if ("character" %in% class(simtime)) all.data@simtime <- as.POSIXlt(simtime, tz=tz)
+  else stop("Couldn't read the simtime")
   all.data@crs <- crs
   all.data@tracks <- tracks
   return(all.data)
@@ -146,31 +157,53 @@ read.DeponsTrack <- function(fname, title="NA", landscape="NA", simtime="NA",
 #' @param add Logical, whether to add the track to an existing plot
 #' one animal was tracked during the simulation.
 #' @param ... Optional plotting parameters
+#' @return No return value, called for side effects
 #' @examples data(porpoisetrack)
 #' data("porpoisetrack")
 #' plot(porpoisetrack)
 #'
 #' \donttest{
-#' # Optional: Transform and plot coastline if rgdal is installed
-#' data("coastline")
-#' library(rgdal)
-#' coast2 <- sp::spTransform(coastline, CRS("+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs"))
-#' # Check that the coastline-map is projected the same way as the track before
-#' # plotting:
-#' as.character(crs(porpoisetrack)) == as.character(crs(coast2))
-#' plot(coast2, col="lightyellow2", add=TRUE)
+#' data(coastline)
+#' data(bathymetry)
+#' coastline2 <- sp::spTransform(coastline, crs(bathymetry))
+#'
+#' data(porpoisetrack)
+#' bbox <- bbox(porpoisetrack)
+#' clip.poly <- make.clip.poly(bbox, crs(bathymetry))
+#' if(!identical(crs(bathymetry), crs(coastline2))) stop("Non-matching CRSs")
+#' new.coastline <- rgeos::gIntersection(coastline2, clip.poly, byid = TRUE,
+#'     drop_lower_td = TRUE)
+#'
+#' plot(new.coastline, col="lightyellow2")
+#' plot(porpoisetrack, col="blue", add=TRUE)
+#' plot(clip.poly, add=TRUE)
+#' # Clip to zoom in on smaller region
+#' bbox <- cbind("min"=c(549517, 6155000), "max"=c(636000, 6210000))
+#' rownames(bbox) <- c("x", "y")
+#' clip.poly <- make.clip.poly(bbox, crs(bathymetry))
+#' new.coastline <- rgeos::gIntersection(coastline2, clip.poly, byid = TRUE,
+#'                                       drop_lower_td = TRUE)
+#' plot(new.coastline, col="lightyellow2")
+#' plot(porpoisetrack, col="blue", add=TRUE)
 #' }
+#' @exportMethod plot
 setMethod("plot", signature("DeponsTrack", "missing"),
           function(x, y, trackToPlot=1, add=FALSE, ...)  {
             oldpar <- graphics::par(no.readonly = TRUE)
             on.exit(graphics::par(oldpar))
+            dots <- list(...)
+            col <- "black"
+            if("col" %in% names(dots)) col <- dots$col
+            lwd <- 1
+            if("lwd" %in% names(dots)) lwd <- dots$lwd
+            lty <- 1
+            if("lty" %in% names(dots)) lty <- dots$lty
             the.main <- ifelse(x@title=="NA", "DEPONS track", x@title)
             trk <- x@tracks[[trackToPlot]]
-            if (!add) plot(sp::coordinates(trk), type="l", asp=1, main=the.main)
-            else lines(sp::coordinates(trk), type="l", asp=1, main=the.main)
+            if (!add) plot(sp::coordinates(trk), type="l", asp=1, main=the.main, col=col, lwd=lwd, lty=lty)
+            else lines(sp::coordinates(trk), type="l", asp=1, main=the.main, col=col, lwd=lwd, lty=lty)
           }
 )
-
 
 
 # Don't move following method to file 'raster-methods' -- classes defined
@@ -178,15 +211,52 @@ setMethod("plot", signature("DeponsTrack", "missing"),
 ### @describeIn plot-DeponsRaster-ANY-method Plots a DeponsRaster object
 setMethod("plot", signature("DeponsRaster", "DeponsTrack"),
           function(x, y, trackToPlot=1, ...)  {
-            if (missing(main)) {
-              main <- paste(x@landscape, x@type, sep=" - ")
-            }
+            dots <- list(...)
+            col <- "black"
+            if("col" %in% names(dots)) col <- dots$col
+            lwd <- 1
+            if("lwd" %in% names(dots)) lwd <- dots$lwd
+            lty <- 1
+            if("lty" %in% names(dots)) lty <- dots$lty
+            main <- y@title
+            if("main" %in% names(dots)) main <- dots$main
             oldpar <- graphics::par(no.readonly = TRUE)
             on.exit(graphics::par(oldpar))
-            plot(y@tracks[[trackToPlot]], col="white")
-            plot(x, col=col, main=main, add=TRUE, legend=FALSE)
+            plot(y@tracks[[trackToPlot]], col="white", main=main)
+            plot(x, main=main, add=TRUE, legend=FALSE)
             y.coords <- y@tracks[[trackToPlot]]@coords
-            lines(y.coords)
+            lines(y.coords, lwd=lwd, lty=lty, col=col)
+          }
+)
+
+
+#' @name bbox
+#' @rdname bbox
+#' @title Get bbox from Depons* object
+#' @description Retrieves spatial bounding box from object. If a Depons* object
+#' is a DeponsTrack object containing multiple track, the box bounds all tracks.
+#' @aliases bbox,DeponsTrack-method
+#' @param obj DeponsRaster or DeponsTrack object
+#' @return Returns a \code{matrix} defining the northern, southern, eastern and
+#' western boundary of a DeponsRaster object or of one or more DeponsTrack
+#' objects.
+#' @seealso \code{\link{make.clip.poly}}
+#' @exportMethod bbox
+setMethod("bbox", signature("DeponsTrack"),
+          function(obj) {
+            xmin <- ymin <- 99999999999999999999999
+            xmax <- ymax <- -99999999999999999999999
+            for(i in 1:length(obj@tracks)) {
+              one.track <- obj@tracks[[i]]
+              if(one.track@bbox["x", "min"] < xmin) xmin <- one.track@bbox["x", "min"]
+              if(one.track@bbox["y", "min"] < ymin) ymin <- one.track@bbox["y", "min"]
+              if(one.track@bbox["x", "max"] > xmax) xmax <- one.track@bbox["x", "max"]
+              if(one.track@bbox["y", "max"] > ymax) ymax <- one.track@bbox["y", "max"]
+            }
+            x <- c(xmin, xmax)
+            y <- c(ymin, ymax)
+            extremes <- sp::SpatialPoints(cbind(x,y))
+            return(sp::bbox(extremes))
           }
 )
 
