@@ -1,7 +1,6 @@
 
 # Author: Jacob Nabe-Nielsen
-# Date: 1 August 2020
-# Version 0.9
+# Date: 1 August 2020 (v. 0.9)
 # Licence GPL v3
 # Description: Methods and classes for reading and summarizing DEPONS raster
 #   objects
@@ -132,7 +131,7 @@ read.DeponsRaster <- function(fname, type="NA", landscape="NA",
                               crs="NA") {
   good.tps <- c("food", "patches", "bathymetry", "dtc", "salinity", "blocks", "NA")
   if (!type %in% good.tps) stop(paste("type =", type, "not allowed"))
-  if (class(crs)=="CRS") crs <- as.character(crs)
+  if (as.character(class(crs))=="CRS") crs <- as.character(crs)
   header <- utils::read.table(fname, nrows=6, header=FALSE)
   names(header) <- c("var", "value")
   header$var <- tolower(header$var)
@@ -199,6 +198,7 @@ setGeneric("plot")
 #' plotting of DeponsRasters cropped to the extent of tracks.
 #' @import rgdal
 #' @return No return value, called for side effects
+#' @importFrom grDevices rainbow
 #' @exportMethod plot
 setMethod("plot", signature("DeponsRaster", "ANY"),
           function(x, y, col, trackToPlot=1, ...)  {
@@ -261,16 +261,16 @@ setMethod("plot", signature("DeponsRaster", "ANY"),
 make.br <- function(template, blocks=NA, blockvals=NULL, NAvalue=-9999,
                     plot=FALSE, fname=NULL, overwrite=FALSE) {
   # the template is another DeponsRaster file with same size and resolution
-  if(class(blocks)!="list") stop("Please a list of 'blocks' to update")
+  if(!inherits(blocks, "list")) stop("Please a list of 'blocks' to update")
   good.class <- function(elem) {
-    any(class(elem)=="matrix") || any(class(elem)=="SpatialPolygons")
+    any(inherits(elem, "matrix")) || any(class(elem)=="SpatialPolygons")
   }
   if(!all(sapply(blocks, FUN=good.class))) {
     stop("All elements in 'blocks' must be of class 'matrix' or
                    'SpatialPolygons'")
   }
   if(missing(blockvals)) blockvals <- 1:(length(blocks)+1)
-  if(class(blockvals)!="integer") stop("'blockvals' should be an vector of integers'")
+  if(!inherits(blockvals,"integer")) stop("'blockvals' should be an vector of integers'")
   if(length(blockvals) != length(blocks)+1) stop("Please provide a value for the
       background plus a value for each element in 'blocks'")
   template@data[] <- blockvals[1]  # Set background value
@@ -283,7 +283,7 @@ make.br <- function(template, blocks=NA, blockvals=NULL, NAvalue=-9999,
                            template@ext$ybottom, template@ext$ytop, crs=template@crs)
   templ.r[] <- blockvals[1]
     for(i in 1:length(blocks)) {
-      if(any(class(blocks[[i]])=="SpatialPolygons")) {
+      if(any(inherits(blocks[[i]],"SpatialPolygons"))) {
         crs.b <- as.character(blocks[[i]]@proj4string)
         crs.t <- as.character(crs(template))
         if(!(is.na(crs.b)==is.na(crs.t))) {
@@ -293,7 +293,7 @@ make.br <- function(template, blocks=NA, blockvals=NULL, NAvalue=-9999,
         }
         new.blocks[[i]] <- blocks[[i]]
       }
-      if(any(class(blocks[[i]])=="matrix")) {
+      if(any(inherits(blocks[[i]],"matrix"))) {
         if(ncol(blocks[[i]])!=2) stop("Matrices defining blocks must have 2 columns")
         bb <- sp::SpatialPoints(blocks[[i]])
         bb <- sp::bbox(bb)

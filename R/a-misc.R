@@ -1,8 +1,11 @@
 # DEPONS2R helper functions (related to multiple classes)
 
 # devtools::document()  # Make rd files based on roxygen comments.
+# devtools::install_deps()
+# devtools::test(filter=NULL)
 # devtools::build_manual()
 # devtools::check(cleanup=FALSE) # check timings of examples: read log
+# devtools::check
 
 #' @title  Package for analyzing DEPONS simulation output
 #' @name DEPONS2R
@@ -15,7 +18,7 @@
 #' \item \code{\linkS4class{DeponsTrack}} movement tracks, read from "RandomPorpoise.XXX.csv" files
 #' \item \code{\linkS4class{DeponsDyn}} population dynamics data, from "Statistics.XXX.csv" files
 #' \item \code{\linkS4class{DeponsBlockdyn}} data from "PorpoisePerBlock.XXX.csv" files
-#' \item \code{\linkS4class{DeponsShips}} data from "ships.json" files
+#' \item \code{\linkS4class{DeponsShips}} data from "ships.json" files or from AIS data
 #' }
 #' Here the \code{DeponsDyn} data include both changes in population size and energetics
 #' through time for the entire landscape, whereas \code{DeponsBlockdyn} data include
@@ -87,7 +90,7 @@ get.simtime <- function(fname=NULL, tz="GMT") {
   substr(time.string, 8, 8) <- "-"
   substr(time.string, 11, 11) <- " "
   time.posix <- as.POSIXlt(time.string, tz=tz)
-  if (any(class(time.posix)=="POSIXlt"))
+  if (any(inherits(time.posix,"POSIXlt")))
     return(time.posix)
   stop(paste0("Could not extract date correctly from ", fname), ". Got ", time.string)
 }
@@ -148,7 +151,7 @@ get.latest.sim <- function(type="dyn", dir) {
 #' @param turb.dist Distance between turbines within a wind farm (meters)
 #' @param min.wf.dist Minimum distance between wind farms (meters)
 #' @param impact Sound source level (dB); sound emitted from turbines during
-#' construction, i.e. from tick.start to tick.end (including both start and end)
+#' construction, i.e. from tickStart to tickEnd (including both start and end)
 #' @param constr.start The tick at which construction of the first turbine starts.
 #' @param constr.end The tick at which construction of the very last turbine in
 #' the last wind farm ends.
@@ -218,7 +221,7 @@ make.windfarms <- function(area.file, area.def, n.wf, n.turb, turb.dist,
     else warning("Only the character string 'random' is supported")
   }
   if (!is.character(wf.coords)) {
-    if (class(wf.coords)!="data.frame") stop("wf.coords must be a data frame")
+    if (!inherits(wf.coords,"data.frame")) stop("wf.coords must be a data frame")
     xy.val <- raster::extract(wf.area, wf.coords)
     sel.rows <- which(xy.val==area.def)
     start.pos <- wf.coords[sel.rows, ]
@@ -278,8 +281,8 @@ make.windfarms <- function(area.file, area.def, n.wf, n.turb, turb.dist,
   constr.end <- floor(constr.end)
   constr.time <- floor(constr.time)
   constr.break <- floor(constr.break)
-  all.wfs$tick.start <- NA
-  all.wfs$tick.end <- NA
+  all.wfs$tickStart <- NA
+  all.wfs$tickEnd <- NA
   # Add start and end time for one turbine at a time
   current.tick <- constr.start
   for (w in 1:max(all.wfs$wf)) {
@@ -290,8 +293,8 @@ make.windfarms <- function(area.file, area.def, n.wf, n.turb, turb.dist,
     if(expected.end.tick > constr.end) current.tick <- constr.start
     for (tt in 1:max(sel.wf$t)) {
       sel.row <- which(all.wfs$wf==w & all.wfs$t==tt)
-      all.wfs[sel.row,]$tick.start <- current.tick
-      all.wfs[sel.row,]$tick.end <- current.tick+constr.time
+      all.wfs[sel.row,]$tickStart <- current.tick
+      all.wfs[sel.row,]$tickEnd <- current.tick+constr.time
       current.tick <- current.tick + constr.time + constr.break
     }
   }
@@ -385,7 +388,7 @@ setGeneric("make.clip.poly", function(bbox, ...){})
 #' clip.poly <- make.clip.poly(bbox, crs(bathymetry))
 setMethod("make.clip.poly", signature("matrix"),
           function(bbox, crs) {
-            if(class(crs)!="CRS") stop("crs must be a 'CRS' object")
+            if(!inherits(crs,"CRS")) stop("crs must be a 'CRS' object")
             if(dim(bbox)[1]!=2 || dim(bbox)[2]!=2) stop("bbox must be a 2x2 matrix")
             if(bbox["x", "min"] >= bbox["x", "max"]) stop("Ensure that bbox[1,1] < bbox[1,2]")
             if(bbox["y", "min"] >= bbox["y", "max"]) stop("Ensure that bbox[2,1] < bbox[2,2]")
