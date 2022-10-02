@@ -1,15 +1,15 @@
-ad69ccb72b21552bd0a91dafa2bf3f7e *DESCRIPTION
-4e41b9e78d5e2b16e310080305ef485f *NAMESPACE
-d90e20e4f8ebe23f778012edc8f368b0 *R/a-misc.R
-d6dd0a0505b13f90bafbe4ca0796efb5 *R/blockdyn-methods.R
+45314cad3d511cc782e43db7af6d12ff *DESCRIPTION
+e7e514bfeaa727b728306e2461e182a3 *NAMESPACE
+857c250bece2557a8b8812c999d94339 *R/a-misc.R
+0bc99ff9b4d482c3cc217016c8cdd650 *R/blockdyn-methods.R
 77e29cfffe00ac2dc4a8c07a58252bf5 *R/data.R
 d5b2b335849651921792c45e920fc5d2 *R/dyn-methods.R
 eefc49e84d14d8d98e9ab8b23c9310d1 *R/parameter-methods.R
 96d87f8f927c19616a48d04cb3d18bb5 *R/raster-methods.R
-19b86e27c89016fc1fdb90f58be07870 *R/ships_methods.R
+b21580921d6e88f013cc559ff00e8fda *R/ships_methods.R
 54867e708a5c6f1c9431e999c8822ec1 *R/track-methods.R
 459031383229ec3b5fb3b72fd1a8ff51 *R/z-accessors.R
-1961639f6f4f7f9efffa91b624b3d060 *build/partial.rdb
+0c6ad5b3446721162c89589e8077ab1c *build/partial.rdb
 f107f71a10e62788087e8e149afbb73f *data/aisdata.RData
 cec04fc3e6878081371bdf506ff55137 *data/bathymetry.RData
 d617547e52d55cf0041832bc167164f8 *data/coastline.RData
@@ -21,9 +21,8 @@ c2c3a80d5267511676664f7e148e0a18 *man/DEPONS2R.Rd
 785328f84b17c508457f8d6213bb6e5f *man/DeponsBlockdyn-class.Rd
 79d3449c71023814a7c4778326be2dcc *man/DeponsDyn-class.Rd
 e89320483acaa4d5c41d972adf1e8bcd *man/DeponsRaster-class.Rd
-3d1eb42551aa1a67df0d619bbaaa3974 *man/DeponsShips-class.Rd
+36e2cc725f79ff8f0495a8ec04b4c2ec *man/DeponsShips-class.Rd
 42ff4160941dc04f3909c92dde794c9a *man/DeponsTrack-class.Rd
-b9af3b527205430c734cc498a5d16f57 *man/ais.to.DeponsShips.Rd
 b357e25e2f8cc671e4a6a3e013cb7bdc *man/aisdata.Rd
 90f379b193ea169f67f70fdf548a5d51 *man/bathymetry.Rd
 c088e079d931748f75267f06bc29c353 *man/bbox.Rd
@@ -32,7 +31,7 @@ d407c6ba4ea314ede05768c6c8a77241 *man/crs.Rd
 e653aad13ae24f23cfe3a75b28fabf0d *man/dyn.Rd
 45693e3368404ed90c78308159f8862b *man/get.latest.sim.Rd
 14c983a78de390aeb7e86682c0ae16e7 *man/get.simtime.Rd
-463d3366c778edb7c8004be244420a50 *man/interpolate.ais.data.Rd
+a9f080c12e6726d666e109357f3b45b8 *man/interpolate.ais.data.Rd
 4f6a6546fe796d41fbebbea8805205d3 *man/landscape.Rd
 b6199f7edda8d2c0815d2f42c85cd786 *man/make.blocksraster.Rd
 59cbcbe2964d2764358f7ce01f38eac0 *man/make.clip.poly.Rd
@@ -49,7 +48,7 @@ b0bba40925dbd4c68db79bac5910a32c *man/read.DeponsBlockdyn.Rd
 4ff92796afc0725368bf35d73b8f8ca8 *man/read.DeponsDyn.Rd
 033645c3eae58133d1d8c081f9b392b9 *man/read.DeponsParam.Rd
 5051af6537960a50bf9bcd1da3cf9da9 *man/read.DeponsRaster.Rd
-f6c2d99233519b6d2678292378d6546a *man/read.DeponsShips.Rd
+980f98de7a3bf4f3404af0ec891791a0 *man/read.DeponsShips.Rd
 93f59d7e0a6e9fd8381347996387eb71 *man/read.DeponsTrack.Rd
 fabb78d52b2600f8cc362a022b1dca90 *man/routes.Rd
 532207e1a1ed507d6b574f5c35b76172 *man/shipdata.Rd
@@ -60,4 +59,4 @@ e8781c85ff850ab29e3014477aee3178 *man/startday.Rd
 f7ef673c20a02abefea6c2af2af3fd02 *man/title.Rd
 9d3139d54527e32a841bedd1bbf0087e *man/write-DeponsShips-method.Rd
 eb9cb5f432c8fa9b0f948a490c0953e8 *tests/testthat.R
-d46b467c418fb812bca9bfd79515b863 *tests/testthat/test_ships_methods.R
+156dd6e2705dac1d80383870a1c0e39b *tests/testthat/test_ships_methods.R
