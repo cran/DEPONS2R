@@ -177,27 +177,11 @@ setGeneric("plot")
 #' defaults are provided.
 #' @param ... Other optional plotting parameters, including 'axes', 'legend',
 #' and 'main'.
-#' @examples
-#' \donttest{
-#' data("bathymetry")
-#' data(coastline)
-#' library(sp)
-#' coastline2 <- spTransform(coastline, crs(bathymetry))
-#' bbox <- bbox(bathymetry)
-#' clip.poly <- make.clip.poly(bbox, crs(bathymetry))
-#' if(!identical(crs(bathymetry), crs(coastline2))) stop("Non-matching CRSs")
-#' new.coastline <- rgeos::gIntersection(coastline2, clip.poly, byid = TRUE, drop_lower_td = TRUE)
-#'
-#' plot(new.coastline, lwd=0.001)
-#' plot(bathymetry, add=TRUE)
-#' plot(new.coastline, add=TRUE, col="lightyellow2")
-#' plot(clip.poly, add=TRUE)
-#' }
 #' @seealso See method for \code{\link[raster]{plot}} in the \code{raster}
 #' package for plotting parameters and \code{\link{plot.DeponsTrack}} for
 #' plotting of DeponsRasters cropped to the extent of tracks.
-#' @import rgdal
 #' @return No return value, called for side effects
+#' @importFrom terra crs
 #' @importFrom grDevices rainbow
 #' @exportMethod plot
 setMethod("plot", signature("DeponsRaster", "ANY"),
@@ -244,9 +228,9 @@ setMethod("plot", signature("DeponsRaster", "ANY"),
             }
             # Use {raster}-package for plotting
             if(x@crs=="NA") {
-              crs2 <- raster::crs(as.character(NA))
+              crs2 <- terra::crs(as.character(NA))
             } else {
-              crs2 <- raster::crs(x@crs)
+              crs2 <- terra::crs(x@crs)
             }
             rdata <- raster::raster(x=x@data, xmn=x@ext$xleft, xmx=x@ext$xright,
                                     ymn=x@ext$ybottom, ymx=x@ext$ytop,

@@ -7,11 +7,17 @@
 # devtools::check(cleanup=FALSE) # check timings of examples: read log
 # devtools::check
 
+# Prevent sp to call code in rgdal or rgeos, which are retiring
+# (see https://r-spatial.org/r/2022/04/12/evolution.html#packages-depending-on-sp-and-raster)
+# devtools::install_github("rsbivand/sp@evolution")
+# Sys.setenv("_SP_EVOLUTION_STATUS_"=2)
+
 #' @title  Package for analyzing DEPONS simulation output
 #' @name DEPONS2R
-#' @description Classes and methods for analyzing and plotting movement tracks
-#' and population dynamics simulated using the DEPONS model
-#' (\url{http://www.depons.eu}), and for handling shipping routes used in the model.
+#' @description  Methods for analyzing population dynamics and movement tracks
+#' simulated using the DEPONS model (v.3.0; \url{http://www.depons.eu}), for
+#' manipulating input raster files, shipping routes and for analyzing sound
+#' propagated from ships.
 #'
 #' The classes used in DEPONS2R include:
 #' \itemize{
@@ -378,7 +384,6 @@ setGeneric("make.clip.poly", function(bbox, ...){})
 #' @param crs CRS object defining the projection of the SpatialPolygons object
 #' to be clipped
 #' @seealso \code{\link{bbox}} for creation of bbox matrix from DeponsRaster
-#' @import rgeos
 #' @exportMethod make.clip.poly
 #' @return \code{SpatialPolygons} object
 #' @examples
