@@ -1,4 +1,4 @@
-16c5d0ba49e263c72bc6a0a6e5964a55 *DESCRIPTION
+4fb232d793286da7cfd21b1254b4c911 *DESCRIPTION
 c06566ee9126c8593dfc5a691ab56a28 *NAMESPACE
 437eb8ab28b6ba1cc3631f8f08962e3a *R/a-misc.R
 0bc99ff9b4d482c3cc217016c8cdd650 *R/blockdyn-methods.R
@@ -6,7 +6,7 @@ c06566ee9126c8593dfc5a691ab56a28 *NAMESPACE
 d5b2b335849651921792c45e920fc5d2 *R/dyn-methods.R
 eefc49e84d14d8d98e9ab8b23c9310d1 *R/parameter-methods.R
 e0ee77550457b7a5c1981127240e578e *R/raster-methods.R
-164643d33adc64efb468185413745129 *R/ships_methods.R
+5e39b466502451e1190b21b42c68b797 *R/ships_methods.R
 466a41329ff1d7b7e612850b3ccdd728 *R/track-methods.R
 459031383229ec3b5fb3b72fd1a8ff51 *R/z-accessors.R
 ea124a494ad7922985532ad3b308e4d5 *build/partial.rdb
