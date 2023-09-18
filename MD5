@@ -1,15 +1,15 @@
-5f879ad5c4a1b2a72f09d8994e8c91aa *DESCRIPTION
+8478baa85f84832631040fd284b9f4df *DESCRIPTION
 c06566ee9126c8593dfc5a691ab56a28 *NAMESPACE
-437eb8ab28b6ba1cc3631f8f08962e3a *R/a-misc.R
+fbfc23db2798008700a980801769ed59 *R/a-misc.R
 0bc99ff9b4d482c3cc217016c8cdd650 *R/blockdyn-methods.R
 77e29cfffe00ac2dc4a8c07a58252bf5 *R/data.R
 d5b2b335849651921792c45e920fc5d2 *R/dyn-methods.R
 eefc49e84d14d8d98e9ab8b23c9310d1 *R/parameter-methods.R
 e0ee77550457b7a5c1981127240e578e *R/raster-methods.R
-3e9083b6dccd3cb7a4777e0756278898 *R/ships_methods.R
+04375f0a4e10bca0a4e576e24fd717f5 *R/ships_methods.R
 466a41329ff1d7b7e612850b3ccdd728 *R/track-methods.R
 459031383229ec3b5fb3b72fd1a8ff51 *R/z-accessors.R
-ea124a494ad7922985532ad3b308e4d5 *build/partial.rdb
+7080893e02c49cd296d4424b9be55069 *build/partial.rdb
 f107f71a10e62788087e8e149afbb73f *data/aisdata.RData
 cec04fc3e6878081371bdf506ff55137 *data/bathymetry.RData
 d617547e52d55cf0041832bc167164f8 *data/coastline.RData
@@ -23,7 +23,7 @@ d617547e52d55cf0041832bc167164f8 *data/coastline.RData
 e89320483acaa4d5c41d972adf1e8bcd *man/DeponsRaster-class.Rd
 36e2cc725f79ff8f0495a8ec04b4c2ec *man/DeponsShips-class.Rd
 8b87590e1f551636880d7c4f23ab8992 *man/DeponsTrack-class.Rd
-aba58308e7ba466634fc21ad6b747936 *man/ais.to.DeponsShips.Rd
+b43ad4ea675a5e9fb1b388171963e150 *man/ais.to.DeponsShips.Rd
 b357e25e2f8cc671e4a6a3e013cb7bdc *man/aisdata.Rd
 90f379b193ea169f67f70fdf548a5d51 *man/bathymetry.Rd
 c088e079d931748f75267f06bc29c353 *man/bbox.Rd
@@ -32,7 +32,7 @@ d407c6ba4ea314ede05768c6c8a77241 *man/crs.Rd
 e653aad13ae24f23cfe3a75b28fabf0d *man/dyn.Rd
 45693e3368404ed90c78308159f8862b *man/get.latest.sim.Rd
 14c983a78de390aeb7e86682c0ae16e7 *man/get.simtime.Rd
-a9f080c12e6726d666e109357f3b45b8 *man/interpolate.ais.data.Rd
+89be6233d73cc10c0dd4386802f34a60 *man/interpolate.ais.data.Rd
 4f6a6546fe796d41fbebbea8805205d3 *man/landscape.Rd
 b6199f7edda8d2c0815d2f42c85cd786 *man/make.blocksraster.Rd
 59cbcbe2964d2764358f7ce01f38eac0 *man/make.clip.poly.Rd
@@ -40,7 +40,7 @@ ec1767cce6ba99667ec8ae63332e5636 *man/make.windfarms.Rd
 06e6e874c10cbc11b80ad30892bc24a5 *man/plot-DeponsBlockdyn-missing-method.Rd
 b22a6a2f404279413efaccd98d7246e1 *man/plot-DeponsDyn-missing-method.Rd
 274a05830619a28edc6eba05cba126be *man/plot-DeponsRaster-ANY-method.Rd
-348955b72f6c23a77c46de62a7cb16cf *man/plot-DeponsShips-missing-method.Rd
+3d85de7497463ce5c56fcd1c52ae5e08 *man/plot-DeponsShips-missing-method.Rd
 57f73800a3568fd91388d4801beaa0b0 *man/plot-DeponsTrack-missing-method.Rd
 b75c4cb32ebf0259ad24feda8412964d *man/porpoisebdyn.Rd
 37e8b9ee998db4115c11b06c77a74a06 *man/porpoisedyn.Rd
