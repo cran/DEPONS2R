@@ -34,8 +34,7 @@ setMethod("crs", signature("DeponsShips"),
 #' Get or set map projection
 #' @name crs
 #' @description Get or set the map projection (also known as coordinate reference
-#' system, crs) of DeponsRaster and DeponsTrack objects. For {sp} objects the
-#' text string defining the crs is called the \code{\link[sp]{proj4string}}.
+#' system, crs) of DeponsRaster and DeponsTrack objects.
 #' @aliases crs,DeponsRaster-method
 #' @aliases crs,DeponsShips-method
 #' @aliases crs,DeponsTrack-method
@@ -59,7 +58,7 @@ setMethod("crs", signature("DeponsRaster"),
 #' @rdname crs
 #' @param x Object of class class \code{DeponsRaster}, \code{DeponsShips} or
 #' \code{DeponsTrack}
-#' @param value \code{\link{proj4string}} identifying the map projection
+#' @param value (proj4string) identifying the map projection
 #' @exportMethod crs<-
 setMethod("crs<-", "DeponsTrack", function(x, value) {
   x@crs <- value
@@ -72,7 +71,7 @@ setMethod("crs<-", "DeponsTrack", function(x, value) {
 #' @rdname crs
 #' @param x Object of class class \code{DeponsRaster}, \code{DeponsShips} or
 #' \code{DeponsTrack}
-#' @param value \code{\link{proj4string}} identifying the map projection
+#' @param value (proj4string) identifying the map projection
 #' @exportMethod crs<-
 setMethod("crs<-", "DeponsShips", function(x, value) {
   x@crs <- value
@@ -86,7 +85,7 @@ setMethod("crs<-", "DeponsShips", function(x, value) {
 #' @aliases crs<-,DeponsRaster-method
 #' @param x Object of class class \code{DeponsRaster}, \code{DeponsShips} or
 #' \code{DeponsTrack}
-#' @param value \code{\link{proj4string}} identifying the map projection
+#' @param value (proj4string) identifying the map projection
 #' @exportMethod crs<-
 setMethod("crs<-", "DeponsRaster", function(x, value) {
   x@crs <- value
