@@ -12,7 +12,8 @@ interpolate.ais.data(aisdata)
 (recorded ship position, unit: meters), and potentially additional columns}
 }
 \value{
-Returns a data frame with the same columns as the input data
+Returns a data frame with the same columns as the input data. Tracks
+that are too short to interpolate are omitted (with a warning)
 }
 \description{
 Interpolates ship movement tracks obtained from Automatic
@@ -26,7 +27,7 @@ ais.testdata <- aisdata[c(12,14,16) ,]
 plot(ais.testdata[c("x", "y")], asp=1, col="green", pch=16, xlim=c(780000, 837000))
 lines(ais.testdata[c("x", "y")])
 # Add 600 sec to 'time' to mis-allign with intervcal needed
-ais.testdata$time <- format(as.POSIXlt(ais.testdata$time)+600)
+ais.testdata$time <- format(as.POSIXlt(ais.testdata$time, tz = "UTC")+600)
 text(ais.testdata[c("x", "y")]-900, ais.testdata$time, adj=0, cex=0.5)
 interpolated <- interpolate.ais.data(ais.testdata)
 points(interpolated[,c("x", "y")], col="red")

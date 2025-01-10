@@ -32,7 +32,7 @@ setMethod("initialize", "DeponsTrack",
           function(.Object) {
             .Object@title <- "NA"
             .Object@landscape <- "NA"
-            .Object@simtime <- as.POSIXlt(NA)
+            .Object@simtime <- as.POSIXlt(NA, tz = "UTC")
             .Object@crs <- "NA"
             one.track <- sp::SpatialPointsDataFrame(as.matrix(data.frame("x"=0,
                           "y"=0), ncol=2), proj4string=sp::CRS(as.character(NA)),
@@ -88,7 +88,7 @@ setMethod("summary", "DeponsTrack",
 #' @param simtime Character sting with date of simulation (format yyyy-mm-dd).
 #' If not provided this is obtained from name of input file
 #' @param crs Character, coordinate reference system (map projection)
-#' @param tz Time zone used in simulations. Defaults to UTC/GMT.
+#' @param tz Time zone used in simulations. Defaults to UTC.
 #' #'
 #' @return Returns a \code{DeponsTrack} object with the elements \code{title},
 #' \code{simtime}, \code{crs}, and \code{tracks}. The \code{date} is extracted
@@ -115,31 +115,34 @@ setMethod("summary", "DeponsTrack",
 #' # Plot the first of the simulated tracks
 #' plot(porpoisetrack)
 #' @export read.DeponsTrack
-read.DeponsTrack <- function(fname, title="NA", landscape="NA", simtime="NA",
-                             crs=as.character(NA), tz="UTC") {
-  raw.data <- utils::read.csv(fname, sep=";")
-  # Get sim date and time from file name
-  if (simtime=="NA")  simtime <- get.simtime(fname)
+read.DeponsTrack <- function (fname, title = "NA", landscape = "NA", simtime = "NA",
+                              crs = as.character(NA), tz = "UTC") {
+  raw.data <- utils::read.csv(fname, sep = ";")
+  if (as.character(simtime) == "NA")
+    simtime <- get.simtime(fname)
   tracks <- list()
   ids <- sort(unique(raw.data$Id))
   for (i in length(ids)) {
     id <- ids[i]
-    one.track <- raw.data[raw.data$Id==id, ]
+    one.track <- raw.data[raw.data$Id == id, ]
     ot.coords <- one.track[, c("UtmX", "UtmY")]
     colnames(ot.coords) <- c("x", "y")
-    ot.data <- one.track[, c("tick", "Id", "EnergyLevel", "DeterStrength",
-                             "DispersalMode", "PSMActive", "PSMTargetUtmX",
+    ot.data <- one.track[, c("tick", "Id", "EnergyLevel",
+                             "DeterStrength", "DispersalMode", "PSMActive", "PSMTargetUtmX",
                              "PSMTargetUtmX")]
-    if(is.na(as.character(crs))) crs <- as.character(NA)
-    one.track.spdf <- sp::SpatialPointsDataFrame(ot.coords, ot.data,
-                                                 proj4string=sp::CRS(crs))
+    if (is.na(as.character(crs)))
+      crs <- as.character(NA)
+    one.track.spdf <- sp::SpatialPointsDataFrame(ot.coords,
+                                                 ot.data, proj4string = sp::CRS(crs))
     tracks[[i]] <- one.track.spdf
   }
   all.data <- new("DeponsTrack")
   all.data@title <- title
   all.data@landscape <- landscape
-  if ("POSIXlt" %in% class(simtime)) all.data@simtime <- simtime
-  else if ("character" %in% class(simtime)) all.data@simtime <- as.POSIXlt(simtime, tz=tz)
+  if ("POSIXlt" %in% class(simtime))
+    all.data@simtime <- simtime
+  else if ("character" %in% class(simtime))
+    all.data@simtime <- as.POSIXlt(simtime, tz = tz)
   else stop("Couldn't read the simtime")
   all.data@crs <- crs
   all.data@tracks <- tracks
@@ -147,7 +150,7 @@ read.DeponsTrack <- function(fname, title="NA", landscape="NA", simtime="NA",
 }
 
 
-#' @title Convert DEPONS track to data frame
+#' @title Convert DeponsTrack to data frame
 #' @description Function  for converting DEPONS movement track file to a
 #' data frame.
 #' @param x DeponsTrack object
